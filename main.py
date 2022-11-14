@@ -5,7 +5,7 @@ from CircuitModeling import Circuit, Element
 from CircuitSimulator import VirtualCircuitEmulator
 
 
-def create_demo_circuit_in_mem():
+def create_demo_circuit_in_mem() -> Circuit:
     # a, b, c, d, e, f
     signals_table = ['z']*6
     # a, b, c
@@ -43,11 +43,11 @@ def create_demo_circuit_in_mem():
 
 def testbench_a(circuit: Circuit):
     size = len(circuit.get_top_inputs_indexes())
-    input_table = list(product([0, 1], repeat=size))
+    inputs_table = list(product([0, 1], repeat=size))
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     i = circuit.get_elements_table()[-1].get_output_index()
     print(f"(a, b, c) : d")
-    for inputs in input_table:
+    for inputs in inputs_table:
         print(f"{inputs} : {vc_sim.simulate_circuit(inputs)[i]}")
 
 
@@ -57,11 +57,11 @@ def testbench_b(circuit: Circuit):
     for N in [10, 100, 4400, 10_000, 20_000]:
         avg_switching_activity = vc_sim.simulate_circuit_with_workload(N)
         avg_switching_activity = [avg_switching_activity[i] for i in i_list]
-        print(f"{N = } {avg_switching_activity =}")
+        print(f"{N = } {avg_switching_activity = }")
 
 
 def testbench_c(circuit: Circuit):
-    sp_table = [0.4400, 0.4400, 0.4400, 0.4400]
+    sp_table = [0.4400]*len(circuit.get_top_inputs_indexes())
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     res = vc_sim.simulate_circuit(sp_table)
     print("Signal Probability", res)
@@ -71,12 +71,14 @@ def testbench_c(circuit: Circuit):
 if __name__ == "__main__":
     np.random.seed(10)
     circuit = create_demo_circuit_in_mem()
-    testbench_a(circuit)
-    testbench_b(circuit)
+    print(circuit)
+    #testbench_a(circuit)
+    #testbench_b(circuit)
     testbench_c(circuit)
     
     circuit = Circuit()
     circuit.load_from_file("circuit.txt")
-    testbench_a(circuit)
-    testbench_b(circuit)
+    print(circuit)
+    #testbench_a(circuit)
+    #testbench_b(circuit)
     testbench_c(circuit)

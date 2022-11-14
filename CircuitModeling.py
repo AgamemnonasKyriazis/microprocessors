@@ -27,11 +27,11 @@ class Element:
 
 class Circuit:
 
-    def __init__(self, top_inputs_indexes=[], elements_type_table=[], elements_table=[], signals_table=[]) -> None:
-        self.top_inputs_indexes = top_inputs_indexes
-        self.elements_type_table = elements_type_table
-        self.elements_table = elements_table
-        self.signals_table = signals_table
+    def __init__(self, top_inputs_indexes=None, elements_type_table=None, elements_table=None, signals_table=None) -> None:
+        self.top_inputs_indexes = [] if top_inputs_indexes is None else top_inputs_indexes
+        self.elements_type_table = [] if elements_type_table is None else elements_type_table
+        self.elements_table = [] if elements_table is None else elements_table
+        self.signals_table = [] if signals_table is None else signals_table
 
     def load_from_file(self, file_name):
         _intermediate_signals = []
@@ -40,21 +40,23 @@ class Circuit:
         with open(file_name, "r") as fp:
             # read all lines
             lines = fp.readlines()
-            line = lines[0]
+            i = 0
+            while lines[i].startswith("#"):
+                i += 1
             # if file starts with top inputs declaration
+            line = lines[i]
             if str(line).startswith("top_inputs"):
                 print("Found top level inputs declaration")
                 _top_inputs = list(map(str.strip, line.split(" ")))[1:]
-                lines = lines[1:]
+                lines = lines[i+1:]
                 # remove the first line
             # read all lines (remaining)
             for line in lines:
-                # comments, ignore it
-                if str(line).startswith("#"):
-                    print("Found Comment")
-                    continue
                 # split each line
                 elem_str_list = list(map(str.strip, line.split(" ")))
+                # comments, ignore it
+                if elem_str_list[0].startswith("#"):
+                    continue
                 # element type "AND", "OR", etc
                 elem_type = elem_str_list[0]
                 # element signal output
@@ -79,6 +81,7 @@ class Circuit:
                 # add element output in all signals (if not exists)
                 if elem_output not in _all_signals:
                     _all_signals.append(elem_output)
+                if elem_output not in _intermediate_signals:
                     _intermediate_signals.append(elem_output)
                 # element output index (we will use this on Element init)
                 obj_elem_output_index = _all_signals.index(elem_output)
