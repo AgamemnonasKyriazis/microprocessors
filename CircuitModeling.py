@@ -27,13 +27,27 @@ class Element:
 
 class Circuit:
 
-    def __init__(self, top_inputs_indexes=None, elements_type_table=None, elements_table=None, signals_table=None) -> None:
+    def __init__(self, top_inputs_indexes=None, elements_type_table=None, 
+    elements_table=None, signals_table=None) -> None:
+        # Circuit constructor
         self.top_inputs_indexes = [] if top_inputs_indexes is None else top_inputs_indexes
         self.elements_type_table = [] if elements_type_table is None else elements_type_table
         self.elements_table = [] if elements_table is None else elements_table
         self.signals_table = [] if signals_table is None else signals_table
 
+    def __str__(self):
+        return f"Top inputs indexes, {self.top_inputs_indexes}\n" \
+               f"Elements type table, {self.elements_type_table}\n" \
+               f"Elements table,\n{''.join([elem.__str__() for elem in self.elements_table])}" \
+               f"Signals table, {self.signals_table}"
+
     def load_from_file(self, file_name):
+        """
+            Load circuit structure from file.
+
+                Parameters:
+                    file_name (str): The the text file describing the circuit
+        """
         _intermediate_signals = []
         _all_signals = []
         _top_inputs = []
@@ -102,11 +116,14 @@ class Circuit:
             for i in range(len(_all_signals)):
                 if _all_signals[i] not in _intermediate_signals:
                     self.top_inputs_indexes.append(i)
-        self.signals_table = ['z']*len(_all_signals)
-        self.sort_circuit_elements()
+        self.signals_table = [0]*len(_all_signals)
+        self._sort_circuit_elements()
         self.top_output_index = self.elements_table[-1].get_output_index()
 
-    def sort_circuit_elements(self):
+    def _sort_circuit_elements(self):
+        """
+            Sorts the elements of the circuits.
+        """
         # initialize variables for sorting the vc elements
         _sorted_elements_table = []
         _marked_elements = [0]*len(self.elements_table)
@@ -131,12 +148,6 @@ class Circuit:
     def _get_new_elem(self):
         return f"E{len(self.elements_table) + 1}"
 
-    def __str__(self):
-        return f"Top inputs indexes, {self.top_inputs_indexes}\n" \
-               f"Elements type table, {self.elements_type_table}\n" \
-               f"Elements table,\n{''.join([elem.__str__() for elem in self.elements_table])}" \
-               f"Signals table, {self.signals_table}"
-
     def get_top_inputs_indexes(self):
         return self.top_inputs_indexes
 
@@ -151,3 +162,9 @@ class Circuit:
 
     def update_signal(self, signal_index, signal_value):
         self.signals_table[signal_index] = signal_value
+    
+    def get_output_signals_indexes(self):
+        return [elem.get_output_index() for elem in self.get_elements_table()]
+    
+    def reset(self):
+        self.signals_table = [0]*len(self.signals_table)

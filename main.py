@@ -1,13 +1,18 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from numpy.random import randint
+
 from itertools import product
 
 from CircuitModeling import Circuit, Element
 from CircuitSimulator import VirtualCircuitEmulator
+from GeneticAlgorithm import GeneticAlgorithm
+from Utilities import disp_progress_bar
 
 
 def create_demo_circuit_in_mem() -> Circuit:
     # a, b, c, d, e, f
-    signals_table = ['z']*6
+    signals_table = [0]*6
     # a, b, c
     top_inputs_indexes = [0, 1, 2]
     # AND, NOT
@@ -55,7 +60,8 @@ def testbench_b(circuit: Circuit):
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     i_list = [elem.get_output_index() for elem in circuit.get_elements_table()]
     for N in [10, 100, 4400, 10_000, 20_000]:
-        avg_switching_activity = vc_sim.simulate_circuit_with_workload(N)
+        switches_table = vc_sim.simulate_circuit_with_workload(N)
+        avg_switching_activity = list(map((lambda u: u/N), switches_table))
         avg_switching_activity = [avg_switching_activity[i] for i in i_list]
         print(f"{N = } {avg_switching_activity = }")
 
@@ -68,17 +74,82 @@ def testbench_c(circuit: Circuit):
     print("Switching Activity", list(map(lambda u: 2*u*(1-u), res)))
 
 
+def homework4_1(circuit: Circuit):
+    print("Executing random search")
+    n = 2000
+    l = 2
+    vc_sim = VirtualCircuitEmulator(circuit=circuit)
+    
+    def objective(inputs):
+        score = sum(vc_sim.simulate_circuit_with_workload(workload=inputs))
+        circuit.reset()
+        return score
+    
+    genetic_algorithm = GeneticAlgorithm(N=n, L=l, M=0.01, objective=objective)
+    genetic_algorithm.init_individuals(gene_size=len(circuit.get_top_inputs_indexes()))
+    genetic_algorithm.evaluate()
+    x = list(range(n))
+    y = [s for s in genetic_algorithm.get_score_per_individual()]
+    return (x, y)
+
+
+def homework4_3(circuit: Circuit):
+    print("Executing genetic algorithm")
+    n = 30
+    l = 2
+    Gen = 100
+    m = 0.05
+    
+    vc_sim = VirtualCircuitEmulator(circuit=circuit)
+    
+    def objective(inputs):
+        score = sum(vc_sim.simulate_circuit_with_workload(workload=inputs))
+        circuit.reset()
+        return score
+
+    genetic_algorithm = GeneticAlgorithm(N=n, L=l, M=m, objective=objective)
+    genetic_algorithm.init_individuals(gene_size=len(circuit.get_top_inputs_indexes()))
+
+    x = list(range(Gen))
+    y = []
+    for g in range(Gen):
+        genetic_algorithm.run()
+        m_i = genetic_algorithm.get_max_score_index()
+        max_score = genetic_algorithm.get_score_per_individual()[m_i]
+        disp_progress_bar(low=g, high=Gen)
+        y.append(max_score)
+
+    return (x, y)
+
 if __name__ == "__main__":
-    np.random.seed(10)
-    circuit = create_demo_circuit_in_mem()
-    print(circuit)
+    # Lab 3
+    #np.random.seed(10)
+    #circuit = create_demo_circuit_in_mem()
+    #print(circuit)
     #testbench_a(circuit)
     #testbench_b(circuit)
-    testbench_c(circuit)
+    #testbench_c(circuit)
     
     circuit = Circuit()
-    circuit.load_from_file("circuit.txt")
-    print(circuit)
+    circuit.load_from_file("circuit2.txt")
+    #print(circuit)
     #testbench_a(circuit)
     #testbench_b(circuit)
-    testbench_c(circuit)
+    #testbench_c(circuit)
+    
+    # Lab 4
+    x, y = homework4_1(circuit)
+    plt.plot(x, y)
+    plt.title("Random Search")
+    plt.xlabel("individual")
+    plt.ylabel("switches")
+    plt.show()
+
+    for i in range(6):
+        x, y = homework4_3(circuit)
+        print(f"Done executing worker {i}")
+        plt.plot(x, y)
+    plt.title("Genetic Algorithm")
+    plt.xlabel("gen")
+    plt.ylabel("score")
+    plt.show()

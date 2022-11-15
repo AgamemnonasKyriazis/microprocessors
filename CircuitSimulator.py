@@ -30,6 +30,15 @@ class VirtualCircuitEmulator:
 
 
     def simulate_circuit(self, inputs):
+        """
+            Simulates the circuit for the given inputs.
+
+                Parameters:
+                    inputs (list): The inputs to be assigned
+                
+                Returns:
+                    signals_table (list): The current state of the circuit's signal table
+        """
         for i in range(len(self.circuit.get_top_inputs_indexes())):
             signal_index = self.circuit.get_top_inputs_indexes()[i]
             self.circuit.update_signal(signal_index, inputs[i])
@@ -38,9 +47,19 @@ class VirtualCircuitEmulator:
         return self.circuit.get_signals_table()
 
 
-    def simulate_circuit_with_workload(self, N):
+    def simulate_circuit_with_workload(self, N=None, workload=None):
+        """
+            Simulates the circuit for a given (or random) workload.
+
+                Parameters:
+                    N (int): Workload size
+                    workload (list): Workload to use in simulation
+                
+                Returns:
+                    switches_table (list): Number of switches done for each signal
+        """
         size = len(self.circuit.get_top_inputs_indexes())
-        workload = create_random_workload(N, size)
+        workload = create_random_workload(N, size) if workload is None else workload
         switches_table = [0]*len(self.circuit.get_signals_table())
         for inputs in workload:
             old_signals_values = [sgn for sgn in self.circuit.get_signals_table()]
@@ -48,4 +67,4 @@ class VirtualCircuitEmulator:
             for elem in self.circuit.get_elements_table():
                 i = elem.get_output_index()
                 switches_table[i] += 1 if old_signals_values[i] != new_signals_values[i] else 0
-        return list(map((lambda u: u/N), switches_table))
+        return [switches_table[i] for i in self.circuit.get_output_signals_indexes()]
