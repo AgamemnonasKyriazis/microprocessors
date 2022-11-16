@@ -58,18 +58,18 @@ def testbench_a(circuit: Circuit):
 
 def testbench_b(circuit: Circuit):
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
-    i_list = [elem.get_output_index() for elem in circuit.get_elements_table()]
     for N in [10, 100, 4400, 10_000, 20_000]:
         switches_table = vc_sim.simulate_circuit_with_workload(N)
         avg_switching_activity = list(map((lambda u: u/N), switches_table))
-        avg_switching_activity = [avg_switching_activity[i] for i in i_list]
         print(f"{N = } {avg_switching_activity = }")
 
 
 def testbench_c(circuit: Circuit):
     sp_table = [0.4400]*len(circuit.get_top_inputs_indexes())
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
+    i_list = [elem.get_output_index() for elem in circuit.get_elements_table()]
     res = vc_sim.simulate_circuit(sp_table)
+    res = [circuit.get_signals_table()[i] for i in i_list]
     print("Signal Probability", res)
     print("Switching Activity", list(map(lambda u: 2*u*(1-u), res)))
 
@@ -124,18 +124,18 @@ def homework4_3(circuit: Circuit):
 if __name__ == "__main__":
     # Lab 3
     #np.random.seed(10)
-    #circuit = create_demo_circuit_in_mem()
-    #print(circuit)
-    #testbench_a(circuit)
-    #testbench_b(circuit)
-    #testbench_c(circuit)
+    circuit = create_demo_circuit_in_mem()
+    print(circuit)
+    testbench_a(circuit)
+    testbench_b(circuit)
+    testbench_c(circuit)
     
     circuit = Circuit()
-    circuit.load_from_file("circuit2.txt")
-    #print(circuit)
-    #testbench_a(circuit)
-    #testbench_b(circuit)
-    #testbench_c(circuit)
+    circuit.load_from_file("circuit.txt")
+    print(circuit)
+    testbench_a(circuit)
+    testbench_b(circuit)
+    testbench_c(circuit)
     
     # Lab 4
     x, y = homework4_1(circuit)
