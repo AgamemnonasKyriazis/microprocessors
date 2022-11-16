@@ -65,7 +65,7 @@ def testbench_b(circuit: Circuit):
 
 
 def testbench_c(circuit: Circuit):
-    sp_table = [0.4400]*len(circuit.get_top_inputs_indexes())
+    sp_table = [0.44]*len(circuit.get_top_inputs_indexes())
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     i_list = [elem.get_output_index() for elem in circuit.get_elements_table()]
     res = vc_sim.simulate_circuit(sp_table)
@@ -118,8 +118,8 @@ def homework4_3(circuit: Circuit):
         max_score = genetic_algorithm.get_score_per_individual()[m_i]
         disp_progress_bar(low=g, high=Gen)
         y.append(max_score)
-
     return (x, y)
+
 
 if __name__ == "__main__":
     # Lab 3
@@ -131,9 +131,9 @@ if __name__ == "__main__":
     testbench_c(circuit)
     
     circuit = Circuit()
-    circuit.load_from_file("circuit.txt")
+    circuit.load_from_file("circuit2.txt")
     print(circuit)
-    testbench_a(circuit)
+    #testbench_a(circuit)
     testbench_b(circuit)
     testbench_c(circuit)
     
