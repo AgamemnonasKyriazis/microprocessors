@@ -60,12 +60,14 @@ def testbench_b(circuit: Circuit):
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     for N in [10, 100, 4400, 10_000, 20_000]:
         switches_table = vc_sim.simulate_circuit_with_workload(N)
+        i_list = [elem.get_output_index() for elem in circuit.get_elements_table()]
+        switches_table = [switches_table[i] for i in i_list]
         avg_switching_activity = list(map((lambda u: u/N), switches_table))
         print(f"{N = } {avg_switching_activity = }")
 
 
 def testbench_c(circuit: Circuit):
-    sp_table = [0.44]*len(circuit.get_top_inputs_indexes())
+    sp_table = [0.5]*len(circuit.get_top_inputs_indexes())
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     i_list = [elem.get_output_index() for elem in circuit.get_elements_table()]
     res = vc_sim.simulate_circuit(sp_table)
@@ -103,7 +105,9 @@ def homework4_3(circuit: Circuit):
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     
     def objective(inputs):
-        score = sum(vc_sim.simulate_circuit_with_workload(workload=inputs))
+        switches_table = vc_sim.simulate_circuit_with_workload(workload=inputs)
+        [switches_table[i] for i in circuit.get_output_signals_indexes()]
+        score = sum(switches_table)
         circuit.reset()
         return score
 
@@ -131,9 +135,9 @@ if __name__ == "__main__":
     testbench_c(circuit)
     
     circuit = Circuit()
-    circuit.load_from_file("circuit2.txt")
+    circuit.load_from_file("circuit.txt")
     print(circuit)
-    #testbench_a(circuit)
+    testbench_a(circuit)
     testbench_b(circuit)
     testbench_c(circuit)
     
@@ -145,7 +149,7 @@ if __name__ == "__main__":
     plt.ylabel("switches")
     plt.show()
 
-    for i in range(6):
+    for i in range(4):
         x, y = homework4_3(circuit)
         print(f"Done executing worker {i}")
         plt.plot(x, y)

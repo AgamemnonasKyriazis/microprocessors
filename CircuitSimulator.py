@@ -67,4 +67,4 @@ class VirtualCircuitEmulator:
             for elem in self.circuit.get_elements_table():
                 i = elem.get_output_index()
                 switches_table[i] += 1 if old_signals_values[i] != new_signals_values[i] else 0
-        return [switches_table[i] for i in self.circuit.get_output_signals_indexes()]
+        return switches_table
