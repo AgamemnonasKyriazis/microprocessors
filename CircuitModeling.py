@@ -1,6 +1,6 @@
 class Element:
 
-    def __init__(self, name, operation_index, inputs_indexes, output_index) -> None:
+    def __init__(self, name: str, operation_index: int, inputs_indexes: list, output_index: int) -> None:
         self.name = name
         self.operation_index = operation_index
         self.inputs_indexes = inputs_indexes

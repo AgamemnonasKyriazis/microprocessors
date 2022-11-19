@@ -78,13 +78,15 @@ def testbench_c(circuit: Circuit):
 
 def homework4_1(circuit: Circuit):
     print("Executing random search")
-    n = 2000
+    n = 10
     l = 2
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     
     def objective(inputs):
-        score = sum(vc_sim.simulate_circuit_with_workload(workload=inputs))
-        circuit.reset()
+        switches_table = vc_sim.simulate_circuit_with_workload(workload=inputs)
+        switches_table = [switches_table[i] for i in circuit.get_output_signals_indexes()]
+        score = sum(switches_table)
+        #circuit.reset()
         return score
     
     genetic_algorithm = GeneticAlgorithm(N=n, L=l, M=0.01, objective=objective)
@@ -106,7 +108,7 @@ def homework4_3(circuit: Circuit):
     
     def objective(inputs):
         switches_table = vc_sim.simulate_circuit_with_workload(workload=inputs)
-        [switches_table[i] for i in circuit.get_output_signals_indexes()]
+        switches_table = [switches_table[i] for i in circuit.get_output_signals_indexes()]
         score = sum(switches_table)
         circuit.reset()
         return score
@@ -127,19 +129,19 @@ def homework4_3(circuit: Circuit):
 
 if __name__ == "__main__":
     # Lab 3
-    #np.random.seed(10)
-    circuit = create_demo_circuit_in_mem()
-    print(circuit)
-    testbench_a(circuit)
-    testbench_b(circuit)
-    testbench_c(circuit)
+    np.random.seed(10)
+    #circuit = create_demo_circuit_in_mem()
+    #print(circuit)
+    #testbench_a(circuit)
+    #testbench_b(circuit)
+    #testbench_c(circuit)
     
     circuit = Circuit()
-    circuit.load_from_file("circuit.txt")
+    circuit.load_from_file("circuit2.txt")
     print(circuit)
-    testbench_a(circuit)
-    testbench_b(circuit)
-    testbench_c(circuit)
+    #testbench_a(circuit)
+    #testbench_b(circuit)
+    #testbench_c(circuit)
     
     # Lab 4
     x, y = homework4_1(circuit)
@@ -148,7 +150,7 @@ if __name__ == "__main__":
     plt.xlabel("individual")
     plt.ylabel("switches")
     plt.show()
-
+'''
     for i in range(4):
         x, y = homework4_3(circuit)
         print(f"Done executing worker {i}")
@@ -157,3 +159,4 @@ if __name__ == "__main__":
     plt.xlabel("gen")
     plt.ylabel("score")
     plt.show()
+'''

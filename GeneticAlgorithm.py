@@ -1,4 +1,5 @@
 from numpy.random import randint, rand
+from CircuitSimulator import create_random_workload
 from copy import deepcopy, copy
 
 class Individual:
