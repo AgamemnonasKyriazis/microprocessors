@@ -78,15 +78,16 @@ def testbench_c(circuit: Circuit):
 
 def homework4_1(circuit: Circuit):
     print("Executing random search")
-    n = 10
+    n = 2000
     l = 2
     vc_sim = VirtualCircuitEmulator(circuit=circuit)
     
     def objective(inputs):
         switches_table = vc_sim.simulate_circuit_with_workload(workload=inputs)
         switches_table = [switches_table[i] for i in circuit.get_output_signals_indexes()]
+        print(switches_table)
         score = sum(switches_table)
-        #circuit.reset()
+        circuit.reset()
         return score
     
     genetic_algorithm = GeneticAlgorithm(N=n, L=l, M=0.01, objective=objective)
@@ -150,7 +151,7 @@ if __name__ == "__main__":
     plt.xlabel("individual")
     plt.ylabel("switches")
     plt.show()
-'''
+
     for i in range(4):
         x, y = homework4_3(circuit)
         print(f"Done executing worker {i}")
@@ -159,4 +160,3 @@ if __name__ == "__main__":
     plt.xlabel("gen")
     plt.ylabel("score")
     plt.show()
-'''

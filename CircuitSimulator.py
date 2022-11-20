@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from numpy.random import randint
 
 from CircuitModeling import Circuit, Element
@@ -61,10 +63,11 @@ class VirtualCircuitEmulator:
         size = len(self.circuit.get_top_inputs_indexes())
         workload = create_random_workload(N, size) if workload is None else workload
         switches_table = [0]*len(self.circuit.get_signals_table())
-        for inputs in workload:
-            old_signals_values = [sgn for sgn in self.circuit.get_signals_table()]
-            new_signals_values = self.simulate_circuit(inputs)
+        old_signals_values = deepcopy(self.simulate_circuit(workload[0]))
+        for inputs in workload[1:]:
+            new_signals_values = deepcopy(self.simulate_circuit(inputs))           
             for elem in self.circuit.get_elements_table():
                 i = elem.get_output_index()
                 switches_table[i] += 1 if old_signals_values[i] != new_signals_values[i] else 0
+            old_signals_values = deepcopy(new_signals_values)
         return switches_table
